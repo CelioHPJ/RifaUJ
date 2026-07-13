@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  /* Cores ENEJ customizadas */
+  --color-blue-200: #9ebce7;
+  --color-blue-700: #123c72;
+  --color-blue-800: #0a2d59;
+  --color-blue-900: #07254b;
+  --color-blue-950: #051f42;
+
+  --color-orange-200: #f3d0a2;
+  --color-orange-400: #dfa44e;
+  --color-orange-500: #d98e2a;
+  --color-orange-600: #b5711c;
+}
+
+@layer base {
+  body {
+    @apply bg-blue-950 text-white antialiased;
+  }
+}
