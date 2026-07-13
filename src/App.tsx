@@ -120,7 +120,7 @@ function App() {
     const valorTotal = numerosSelecionados.length * PRECO_RIFA;
 
     try {
-      const result = await gerarPixMercadoPago(0.01, formData.email);
+      const result = await gerarPixMercadoPago(valorTotal, formData.email);
       setDadosPix({
         id: result.id,
         qrCode: result.qr_code,
