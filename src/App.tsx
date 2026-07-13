@@ -3,7 +3,7 @@ import { supabase } from './lib/supabase';
 import { gerarPixMercadoPago, verificarStatusPagamento } from './lib/mercadopago';
 import { Check, Copy, Loader2, CheckCircle } from 'lucide-react';
 
-const PRECO_RIFA = 0.01; // R$ 2,00 por número
+const PRECO_RIFA = 2.00; // R$ 2,00 por número
 
 function App() {
   const [numerosVendidos, setNumerosVendidos] = useState<number[]>([]);
@@ -41,7 +41,7 @@ function App() {
               status: 'pago'
             }));
 
-            const { data, error } = await supabase
+            const { error } = await supabase
               .from('ingressos_rifa')
               .insert(recordsToInsert);
 
