@@ -153,6 +153,15 @@ function App() {
           </p>
         </div>
 
+        {/* Foto da Equipe UJ */}
+        <div className="w-full flex justify-center mb-12">
+          <img
+            src="/EquipeUJ.png"
+            alt="Equipe UJ"
+            className="w-10/12 sm:w-3/4 md:w-2/3 max-w-lg h-auto object-cover rounded-3xl shadow-lg shadow-blue-500/20 border border-blue-800/40"
+          />
+        </div>
+
         {/* Patrocinadores e Apoiadores */}
         <div className="mb-12">
           <h3 className="text-blue-300 text-sm font-bold uppercase tracking-widest text-center mb-4">
