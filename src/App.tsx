@@ -10,7 +10,7 @@ function App() {
   const [numerosSelecionados, setNumerosSelecionados] = useState<number[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalStep, setModalStep] = useState<1 | 2 | 3>(1);
-  const [formData, setFormData] = useState({ nome: '', email: '', telefone: '', endereco: '' });
+  const [formData, setFormData] = useState({ nome: '', email: '', telefone: '', endereco: '', cidade: '', vendedor: '' });
 
   const [isGeneratingPayment, setIsGeneratingPayment] = useState(false);
   const [dadosPix, setDadosPix] = useState({ id: 0, qrCode: '', qrCodeBase64: '' });
@@ -38,6 +38,8 @@ function App() {
               telefone: formData.telefone,
               email: formData.email,
               endereco: formData.endereco,
+              cidade: formData.cidade,
+              vendedor: formData.vendedor,
               status: 'pago'
             }));
 
@@ -102,7 +104,7 @@ function App() {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setFormData({ nome: '', email: '', telefone: '', endereco: '' });
+    setFormData({ nome: '', email: '', telefone: '', endereco: '', cidade: '', vendedor: '' });
     setModalStep(1);
     setDadosPix({ id: 0, qrCode: '', qrCodeBase64: '' });
     if (modalStep === 3) {
@@ -312,6 +314,34 @@ function App() {
                       onChange={handleChange}
                       className="w-full px-4 py-3 rounded-lg border border-blue-700 bg-blue-950 text-white placeholder-blue-300/50 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
                       placeholder="Seu endereço"
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label htmlFor="cidade" className="block text-sm font-medium text-blue-200 mb-1">Cidade</label>
+                    <input
+                      type="text"
+                      id="cidade"
+                      name="cidade"
+                      required
+                      value={formData.cidade}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-lg border border-blue-700 bg-blue-950 text-white placeholder-blue-300/50 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
+                      placeholder="Sua cidade"
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label htmlFor="vendedor" className="block text-sm font-medium text-blue-200 mb-1">Nome do Vendedor</label>
+                    <input
+                      type="text"
+                      id="vendedor"
+                      name="vendedor"
+                      required
+                      value={formData.vendedor}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-lg border border-blue-700 bg-blue-950 text-white placeholder-blue-300/50 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
+                      placeholder="Nome do vendedor (obrigatório)"
                     />
                   </div>
 
