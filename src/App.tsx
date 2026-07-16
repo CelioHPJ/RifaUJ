@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
-import { gerarPixMercadoPago, verificarStatusPagamento } from './lib/mercadopago';
+import { gerarPixMercadoPago } from './lib/mercadopago';
 import { Check, Copy, Loader2, CheckCircle } from 'lucide-react';
 
 const PRECO_RIFA = 2.00; // R$ 2,00 por número
@@ -13,47 +13,32 @@ function App() {
   const [formData, setFormData] = useState({ nome: '', email: '', telefone: '', endereco: '', cidade: '', vendedor: '' });
 
   const [isGeneratingPayment, setIsGeneratingPayment] = useState(false);
-  const [dadosPix, setDadosPix] = useState({ id: 0, qrCode: '', qrCodeBase64: '' });
+  const [dadosPix, setDadosPix] = useState({ id: 0, pedido_id: '', qrCode: '', qrCodeBase64: '' });
 
   useEffect(() => {
     buscarNumerosVendidos();
   }, []);
 
-  // Polling para verificar status do pagamento
+  // Polling para verificar status do pagamento (modo leitura no Supabase)
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
 
-    if (modalStep === 2 && dadosPix.id) {
+    if (modalStep === 2 && dadosPix.pedido_id) {
       interval = setInterval(async () => {
         try {
-          const status = await verificarStatusPagamento(dadosPix.id);
+          const { data, error } = await supabase
+            .from('ingressos_rifa')
+            .select('status')
+            .eq('pedido_id', dadosPix.pedido_id)
+            .limit(1)
+            .single();
 
-          if (status === 'approved') {
+          if (error && error.code !== 'PGRST116') {
+            console.error('Erro ao verificar status:', error);
+          }
+
+          if (data && data.status === 'aprovado') {
             clearInterval(interval);
-
-            // Insere os tickets no banco após aprovação
-            const recordsToInsert = numerosSelecionados.map(num => ({
-              numero: num,
-              nome: formData.nome,
-              telefone: formData.telefone,
-              email: formData.email,
-              endereco: formData.endereco,
-              cidade: formData.cidade,
-              vendedor: formData.vendedor,
-              status: 'pago'
-            }));
-
-            const { error } = await supabase
-              .from('ingressos_rifa')
-              .insert(recordsToInsert);
-
-            if (error) {
-              console.error('❌ ERRO DETALHADO DO SUPABASE:', error);
-              alert('Erro no banco: ' + error.message);
-              // NOTA: Se o erro for de "RLS" ou "policy", será necessário habilitar permissão pública de escrita na tabela "ingressos_rifa" no painel do Supabase.
-              return;
-            }
-
             setModalStep(3); // Vai para a tela de Sucesso
           }
         } catch (err) {
@@ -66,9 +51,9 @@ function App() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [modalStep, dadosPix.id, numerosSelecionados, formData]);
+  }, [modalStep, dadosPix.pedido_id]);
 
-  const buscarNumerosVendidos = async () => {
+  async function buscarNumerosVendidos() {
     const { data, error } = await supabase
       .from('ingressos_rifa')
       .select('numero');
@@ -81,7 +66,7 @@ function App() {
     if (data) {
       setNumerosVendidos(data.map((item) => item.numero));
     }
-  };
+  }
 
   const handleSelectNumero = (num: number) => {
     if (numerosVendidos.includes(num)) return;
@@ -106,7 +91,7 @@ function App() {
     setIsModalOpen(false);
     setFormData({ nome: '', email: '', telefone: '', endereco: '', cidade: '', vendedor: '' });
     setModalStep(1);
-    setDadosPix({ id: 0, qrCode: '', qrCodeBase64: '' });
+    setDadosPix({ id: 0, pedido_id: '', qrCode: '', qrCodeBase64: '' });
     if (modalStep === 3) {
       setNumerosSelecionados([]);
       buscarNumerosVendidos();
@@ -122,13 +107,14 @@ function App() {
     const valorTotal = numerosSelecionados.length * PRECO_RIFA;
 
     try {
-      const result = await gerarPixMercadoPago(valorTotal, formData.email);
+      const result = await gerarPixMercadoPago(valorTotal, formData.email, formData, numerosSelecionados);
       setDadosPix({
         id: result.id,
+        pedido_id: result.pedido_id,
         qrCode: result.qr_code,
         qrCodeBase64: result.qr_code_base64
       });
-    } catch (error) {
+    } catch {
       alert('Erro ao gerar a cobrança PIX. Tente novamente mais tarde.');
       closeModal();
     } finally {
