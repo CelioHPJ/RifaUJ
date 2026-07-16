@@ -1,12 +1,12 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-export const gerarPixMercadoPago = async (valor: number, email: string) => {
+export const gerarPixMercadoPago = async (valor: number, email: string, formData: Record<string, string>, numerosSelecionados: number[]) => {
   const response = await fetch(`${API_URL}/api/gerar-pix`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ valor, email })
+    body: JSON.stringify({ valor, email, formData, numerosSelecionados })
   });
 
   if (!response.ok) {
@@ -16,6 +16,7 @@ export const gerarPixMercadoPago = async (valor: number, email: string) => {
   const data = await response.json();
   return {
     id: data.id,
+    pedido_id: data.pedido_id, // We receive the pedido_id now
     qr_code: data.qr_code,
     qr_code_base64: data.qr_code_base64
   };
