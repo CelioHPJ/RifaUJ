@@ -34,7 +34,7 @@ app.post('/api/gerar-pix', async (req, res) => {
       return res.status(400).json({ error: 'Dados incompletos para gerar PIX' });
     }
 
-    const token = process.env.VITE_MERCADOPAGO_TOKEN;
+    const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
     if (!token) {
       console.error('❌ ERRO: Token do Mercado Pago não encontrado no .env');
       return res.status(500).json({ error: 'Token ausente no backend' });
@@ -126,7 +126,7 @@ app.post('/api/webhook/mercadopago', async (req, res) => {
 
     console.log(`🔍 Verificando pagamento ${paymentId} na API do MP...`);
 
-    const token = process.env.VITE_MERCADOPAGO_TOKEN;
+    const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
     const mpResponse = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -162,7 +162,7 @@ app.post('/api/webhook/mercadopago', async (req, res) => {
 
 app.get('/api/status-pix/:id', async (req, res) => {
   try {
-    const token = process.env.VITE_MERCADOPAGO_TOKEN;
+    const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
     const mpResponse = await fetch('https://api.mercadopago.com/v1/payments/' + req.params.id, {
       headers: {
         'Authorization': 'Bearer ' + token
